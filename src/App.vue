@@ -2,9 +2,13 @@
   <router-view/>
 </template>
 
-<script>
-import ComponentOne from './components/componentOne.vue' // 引入helloWorld组件
+<script lang="ts">
+import { provide, ref } from 'vue'
 export default {
-  name: 'App'
+  name: 'App',
+  setup() {
+    const asideVisible = ref(false)
+    provide('xxx', asideVisible)
+  }
 }
 </script>
