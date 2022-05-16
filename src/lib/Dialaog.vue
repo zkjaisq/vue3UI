@@ -1,32 +1,65 @@
 <template>
   <template v-if="visible">
-    <div class="gulu-dialog-overlay">
+    <div class="gulu-dialog-overlay" @click="onClickOverlay">
       <div class="gulu-dialog-wrapper">
         <div class="gulu-dialog">
-          <header>标题   <span @click="close" class="gulu-dialog-close"></span></header>
+          <header>标题 <span @click="close" class="gulu-dialog-close"></span></header>
           <main>
             <p>文本一</p>
             <p>文本二</p>
           </main>
           <footer>
-            <Button level="main">ok</Button>
-            <Button>cancel</Button>
+            <Button level="main" @click="ok">ok</Button>
+            <Button @click="cancel">cancel</Button>
           </footer>
         </div>
       </div>
     </div>
   </template>
-
 </template>
 <script lang="ts">
 import Button from "../lib/Button.vue"
+
 export default {
   components: {
     Button
   },
   props: {
-    visible: Boolean,
-    default: false
+    visible: {
+      type: Boolean,
+      default: false
+    },
+    // 点击遮罩是否关闭弹窗
+    closeOnClickOverlay: {
+      type: Boolean,
+      default: true
+    },
+    ok: {
+      type: Function
+    },
+    cancel: {
+      type: Function
+    }
+  },
+  setup(props, context) {
+    const close = () => {
+      context.emit("update:visible", false)
+    }
+    const onClickOverlay = () => {
+      if (props.closeOnClickOverlay) {
+        close()
+      }
+    }
+    const ok = () => {
+      if (props.ok?.() !== false) {
+        close()
+      }
+    }
+    const cancel = () => {
+      context.emit("cancel")
+      close()
+    }
+    return {close, onClickOverlay, ok, cancel}
   }
 }
 </script>
@@ -39,6 +72,7 @@ $border-color: #d9d9d9;
   box-shadow: 0 0 3px fade_out(black, 0.5);
   min-width: 15em;
   max-width: 90%;
+
   &-overlay {
     position: fixed;
     top: 0;
@@ -48,6 +82,7 @@ $border-color: #d9d9d9;
     background: fade_out(black, 0.5);
     z-index: 10;
   }
+
   &-wrapper {
     position: fixed;
     left: 50%;
@@ -55,7 +90,8 @@ $border-color: #d9d9d9;
     transform: translate(-50%, -50%);
     z-index: 11;
   }
-  >header {
+
+  > header {
     padding: 12px 16px;
     border-bottom: 1px solid $border-color;
     display: flex;
@@ -63,20 +99,24 @@ $border-color: #d9d9d9;
     justify-content: space-between;
     font-size: 20px;
   }
-  >main {
+
+  > main {
     padding: 12px 16px;
   }
-  >footer {
+
+  > footer {
     border-top: 1px solid $border-color;
     padding: 12px 16px;
     text-align: right;
   }
+
   &-close {
     position: relative;
     display: inline-block;
     width: 16px;
     height: 16px;
     cursor: pointer;
+
     &::before,
     &::after {
       content: '';
@@ -87,9 +127,11 @@ $border-color: #d9d9d9;
       top: 50%;
       left: 50%;
     }
+
     &::before {
       transform: translate(-50%, -50%) rotate(-45deg);
     }
+
     &::after {
       transform: translate(-50%, -50%) rotate(45deg);
     }
