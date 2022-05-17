@@ -1,20 +1,24 @@
 <template>
   <template v-if="visible">
-    <div class="gulu-dialog-overlay" @click="onClickOverlay">
-      <div class="gulu-dialog-wrapper">
-        <div class="gulu-dialog">
-          <header>标题 <span @click="close" class="gulu-dialog-close"></span></header>
-          <main>
-            <p>文本一</p>
-            <p>文本二</p>
-          </main>
-          <footer>
-            <Button level="main" @click="ok">ok</Button>
-            <Button @click="cancel">cancel</Button>
-          </footer>
+<!--    防止对低碳上下文印象dialog位置 使用teleport -->
+    <Teleport to="#app">
+      <div class="gulu-dialog-overlay" @click="onClickOverlay">
+        <div class="gulu-dialog-wrapper">
+          <div class="gulu-dialog">
+            <header>
+              <slot name="title"/>
+              <span @click="close" class="gulu-dialog-close"></span></header>
+            <main>
+              <slot name="content"/>
+            </main>
+            <footer>
+              <Button level="main" @click="ok">ok</Button>
+              <Button @click="cancel">cancel</Button>
+            </footer>
+          </div>
         </div>
       </div>
-    </div>
+    </Teleport>
   </template>
 </template>
 <script lang="ts">
@@ -25,6 +29,10 @@ export default {
     Button
   },
   props: {
+    title: {
+      type: String,
+      default: '提示'
+    },
     visible: {
       type: Boolean,
       default: false
@@ -56,7 +64,7 @@ export default {
       }
     }
     const cancel = () => {
-      context.emit("cancel")
+      props.cancel?.()
       close()
     }
     return {close, onClickOverlay, ok, cancel}
